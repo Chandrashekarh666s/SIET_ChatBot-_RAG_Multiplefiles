@@ -2,21 +2,27 @@ import streamlit as st
 from pathlib import Path
 from rag_engine import load_base, ask_rag
 
-st.set_page_config(page_title="SIET Chatbot",  layout="centered")
+st.set_page_config(
+    page_title="SIET Chatbot",
+    page_icon="🎓",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
 
-# Sidebar for info and controls
-with st.sidebar:
-    st.header("About")
-    st.write("Shridevi Institute of Engineering and Technology")
-    st.caption("RAG Pipeline with Multiple Files")
-    st.caption("Created by Chandrashekar H")
-    st.divider()
+# Top header row: Title on the left, Clear Chat button on the right
+col1, col2 = st.columns([4, 1], vertical_alignment="center")
+
+with col1:
+    st.title("Shridevi Institute of Engineering and Technology - ChatBot")
+
+with col2:
     if st.button("Clear Chat", use_container_width=True):
         st.session_state.chat_hist = []
         st.rerun()
 
-st.title("Shridevi Institute of Engineering and Technology - ChatBot")
 st.caption("Ask anything about college information, Courses, Placements, FAQs, Rules and Regulations")
+st.caption("RAG Pipeline with Multiple Files • Created by Chandrashekar H")
+st.divider()
 
 # Safe API key loading
 if "GROQ_API_KEY" not in st.secrets:
