@@ -17,7 +17,7 @@ def initiate_rag():
 
 
 # Load index, embedding model and chunks
-index, embed_model, chunks = initiate_rag()
+index, embed_model, chunks  = initiate_rag()
 
 
 # Initialize chat history
