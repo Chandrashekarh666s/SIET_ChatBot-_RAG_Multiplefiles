@@ -48,14 +48,13 @@ def load_base(pdf_path="college_docs"):
     pdf_files = list(Path(pdf_path).glob("*.pdf"))
     if not pdf_files:
         raise FileNotFoundError(f"No PDF files found in '{pdf_path}'")
-        
+
     for pdf in pdf_files:
         full_text = load_pdf(pdf)
         chunks.extend(create_chunks(full_text))
-        
-    # Fixed unpacking order to match build_vectors()
+
     embed_model, index = build_vectors(chunks)
-    return embed_model, index, chunks
+    return index, embed_model, chunks
 
 
 # 5. RETRIEVE CONTENT
@@ -64,12 +63,12 @@ def retrieve_content(question, embed_model, chunks, index, num_chunks=3):
         raise ValueError("Question cannot be blank")
     if num_chunks < 1:
         raise ValueError("Request at least one chunk")
-        
+
     query_vector = embed_model.encode([question], convert_to_numpy=True)
     query_vector = np.asarray(query_vector, dtype="float32")
     faiss.normalize_L2(query_vector)
     sim_scores, vec_indices = index.search(query_vector, min(num_chunks, len(chunks)))
-    
+
     background = ""
     for i in vec_indices[0]:
         if i != -1:
@@ -81,7 +80,7 @@ def retrieve_content(question, embed_model, chunks, index, num_chunks=3):
 def ask_rag(question, embed_model, chunks, index, api_key, num_chunks=3, model_name="openai/gpt-oss-120b"):
     if not api_key:
         raise ValueError("API Key Missing")
-        
+
     background = retrieve_content(question, embed_model, chunks, index, num_chunks)
     prompt = f"""You are a professional AI Assistant. Answer the user's question using ONLY the document background below. Do not invent or assume facts. If information is unavailable, say Information Missing.
 
